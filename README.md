@@ -1,0 +1,2 @@
+# african-refugee-project
+This project was created by Firat Kezer, Andrew Zinke and myself during our Human-Computer Interaction Course at NDSU. What this little mock website does is display refugee information from African countries based on data from the United Nations High Commissioner for Refugees data for 2016. It shows which countries had the worst refugge:population ratios and allows you to compare and contrast their data quickly.
