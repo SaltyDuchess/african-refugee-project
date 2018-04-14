@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html>
+
+
+<!-- the following values under the style tag are some CSS used to style various html elements -->
+    <style>
+        img {
+            display: block;
+            margin: auto;
+        }
+
+        body {
+            background-color: black;
+        }
+
+        table, th, td {
+            border: 1px solid white;
+        }
+
+        th, td {
+            text-align: left;
+            color: white;
+            font-size: 55px;
+            font-family: timesnewroman;
+            padding: 5px 15px;
+        }
+
+        table#firstTable {
+            visibility: hidden;
+            width: 25%;
+            margin-top: 2%;
+            background-color: black;
+        }
+
+        table#secondTable {
+            visibility: hidden;
+            width: 25%;
+            background-color: black;
+            margin-top: 800px;
+            margin-left: -25%;
+        }
+
+        #resetButton {
+            width: 5em;
+            height: 2em;
+            font-size: 45px;
+            visibility: hidden;
+            margin-top: 1600px;
+            margin-left: -25%;
+            text-align: left;
+        }
+
+        #grayScaleButton {
+            width: 20em;
+            height: 2em;
+            font-size: 55px;
+        }
+
+        optgroup { 
+            font-size: 45px;
+        }
+
+        select#countries {     
+            margin-left: -25%;
+            width: 20em;
+            height: 2em; 
+            min-width: 50px;
+            font-size: 45px;
+}
+
+        div.sources {
+          position: fixed;
+          bottom: 0;
+          right:0;
+          width: 1500px;
+          border: 3px solid #73AD21;
+          color: white;
+          font-size: 40px;
+}
+
+    </style>
+
+<!-- the following are some javascript plugins, the maphilight plugin specifically helps provide the "outline" effect from mousing over a country on the map -->
+
+    <script type="text/javascript" src="jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="jquery.maphilight.js"></script>
+
+<!-- the following is some quick script to get the maphilight plugin working before geting started on the website -->
+
+    <script type="text/javascript">
+$(function() {
+		$('.map').maphilight({fade: false});
+	});</script>
+
+<!-- the following is setting up some basic intro stuff to the website, such as the title and some simple tutorial text as well as calling the javascript "reset()" function to be extra sure
+everything is properly set so that the program flow will function as intended -->
+
+    <h1 style="color:white; font-family: timesnewroman; font-size: 1000%; margin-top: 200px; text-align:center;">African Refugee Project</h1>
+    <h2 id="basicInstructions" ; visibility:visible; style="color:white; font-family: timesnewroman; font-size: 350%; text-align:center;">(Click on a country or select one from the dropdown to see refugee info)</h2>
+    <body onload="reset()">
+
+<!-- the following is the definitions for the two tables used in the website. these are both set to invisible at their creation and reveal themselves as the user interacts
+with the website, causing values to be added to them -->
+
+        <table id="firstTable" style="float:left;">
+            <tr>
+                <th height="100">Country: </th>
+                <td id="t1Country"></td>
+            </tr>
+            <tr>
+                <th height="50">Total Population in Thousands: </th>
+                <td id="t1Population"></td>
+            </tr>
+            <tr>
+                <th height="50">Total Number of Refugees: </th>
+                <td id="t1Refugees"></td>
+            </tr>
+            <tr>
+                <th height="50"> Refugee:Population Ratio: </th>
+                <td id="t1RefugeeRatio"></td>
+            </tr>
+            <tr>
+                <th height="50"> Primary Country of Asylum: </th>
+                <td id="t1PrimaryAsylum"></td>
+            </tr>
+            <tr>
+                <th height="50"> Secondary Country of Asylum: </th>
+                <td id="t1SecondaryAsylum"></td>
+            </tr>
+            <tr>
+                <th height="50"> Tertiary Country of Asylum: </th>
+                <td id="t1TertiaryAsylum"></td>
+            </tr>
+        </table>
+
+
+        <table id="secondTable" style="float:left;">
+            <tr>
+                <th height="100">Country: </th>
+                <td id="t2Country"></td>
+            </tr>
+            <tr>
+                <th height="50">Total Population in Thousands: </th>
+                <td id="t2Population"></td>
+            </tr>
+            <tr>
+                <th height="50">Total Number of Refugees: </th>
+                <td id="t2Refugees"></td>
+            </tr>
+            <tr>
+                <th height="50"> Refugee:Population Ratio: </th>
+                <td id="t2RefugeeRatio"></td>
+            </tr>
+            <tr>
+                <th height="50"> Primary Country of Asylum: </th>
+                <td id="t2PrimaryAsylum"></td>
+            </tr>
+            <tr>
+                <th height="50"> Secondary Country of Asylum: </th>
+                <td id="t2SecondaryAsylum"></td>
+            </tr>
+            <tr>
+                <th height="50"> Tertiary Country of Asylum: </th>
+                <td id="t2TertiaryAsylum"></td>
+            </tr>
+        </table>
+
+<!-- the following is a drop down list provided to the users to increase usability. if a user knows the name of the country but cannot find it on the map, they can select it here instead -->
+
+        <select name="countries" onchange= "passSelectToStateMachine(this.value)" id="countries" style="float:left;">
+            <optgroup>
+                <option> Select Country to show refugee info</option>
+                <option value="algeria">Algeria</option>
+                <option value="angola">Angola</option>
+                <option value="benin">Benin</option>
+                <option value="botswana">Botswana</option>
+                <option value="burkinafaso">Burkina Faso</option>
+                <option value="burundi">Burundi</option>
+                <option value="cameroon">Cameroon</option>
+                <option value="centralafricanrepublic">Central African Republic</option>
+                <option value="chad">Chad</option>
+                <option value="cotedlvoire">Cote d'lvoire</option>
+                <option value="democraticrepbulicofthecongo">Democratic Repbulic of the Congo</option>
+                <option value="djibouti">Djibouti</option>
+                <option value="egypt">Egypt</option>
+                <option value="equatorialguinea">Equatorial Guinea</option>
+                <option value="eritrea">Eritrea</option>
+                <option value="ethiopia">Ethiopia</option>
+                <option value="gabon">Gabon</option>
+                <option value="gambia">Gambia</option>
+                <option value="ghana">Ghana</option>
+                <option value="guinea">Guinea</option>
+                <option value="guineabissau">Guinea-Bissau</option>
+                <option value="kenya">Kenya</option>
+                <option value="lesotho">Lesotho</option>
+                <option value="liberia">Liberia</option>
+                <option value="libya">Libya</option>
+                <option value="madagascar">Madagascar</option>
+                <option value="malawi">Malawi</option>
+                <option value="mauritania">Mauritania</option>
+                <option value="morocco">Morocco</option>
+                <option value="mozambique">Mozambique</option>
+                <option value="nambia">Nambia</option>
+                <option value="niger">Niger</option>
+                <option value="nigeria">Nigeria</option>
+                <option value="republicofthecongo">Republic of the Congo</option>
+                <option value="rwanda">Rwanda</option>
+                <option value="saotomeandprincipe">Sao Tome and Principe</option>
+                <option value="senegal">Senegal</option>
+                <option value="sierraleone">Sierra Leone</option>
+                <option value="somalia">Somalia</option>
+                <option value="southafrica">South Africa</option>
+                <option value="southsudan">South Sudan</option>
+                <option value="sudan">Sudan </option>
+                <option value="swaziland">Swaziland</option>
+                <option value="tanzania">Tanzania</option>
+                <option value="togo">Togo</option>
+                <option value="tunisia">Tunisia</option>
+                <option value="uganda">Uganda</option>
+                <option value="westernsahara">Western Sahara</option>
+                <option value="zambia">Zambia</option>
+                <option value="zimbabwe">Zimbabwe</option>
+            </optgroup>
+        </select>
+
+<!-- the following is a reset button if the user wants to reset the values on the tables -->
+
+        <input type="button" id="resetButton" value="Reset &#40;R&#41;" onclick="reset();" style="float:left;">
+
+<!-- the following is the image map of africa. this is what makes the map interactable by the user. this code sets the boundaries for which countries are which and defines
+areas that can be clicked on by the user -->
+
+        <center>
+            <img class="map" id="Africa" src="https://i.imgur.com/vgUUKVY.png" alt="Outlines of African Countries" usemap="#africaMap" />
+            <map name="africaMap" id="africaMap">
+                <area alt="morocco" area class="morocco" title="Morocco" shape="poly" coords="218,253,328,262,337,226,391,203,471,178,471,152,489,147,533,141,527,64,466,49,439,37">
+                <area alt="algeria" area class="algeria" title="Algeria" shape="poly" coords="330,276,338,232,471,178,471,161,536,148,538,131,524,69,554,42,591,28,780,19,780,85,754,108,766,138,792,209,801,315,815,364,860,396,648,523">
+                <area alt="tunisia" area class="tunisia" title="Tunisia" shape="poly" coords="784,23,784,85,766,103,754,117,769,133,771,147,792,161,801,209,819,191,815,173,845,147,851,129,833,111,815,111,849,72,833,55,837,37,842,23,810,11">
+                <area alt="libya" area class="libya" title="Libya" shape="poly" coords="853,133,849,150,817,173,817,196,796,214,809,315,796,327,803,350,821,373,849,385,858,403,929,406,941,415,976,403,1188,509,1192,497,1215,491,1203,240,1185,217,1197,170,1144,152,1100,134,1065,161,1065,203,1027,200,944,173,944,156,900,138">
+                <area alt="egypt" area class="egypt" title="Egypt" shape="poly" coords="1192,164,1190,203,1183,221,1199,240,1213,438,1527,429,1483,376,1386,223,1393,209,1439,270,1448,217,1420,164">
+                <area alt="westernsahara" area class="westernsahara" title="Western Sahara" shape="poly" coords="218,253,328,258,324,308,241,306,231,378,206,385,197,396,192,438,95,431,86,440,112,382">
+                <area alt="mauritania" area class="mauritania" title="Mauritania" shape="poly" coords="98,431,192,435,197,391,218,378,236,378,241,302,319,311,328,281,413,338,374,343,377,585,377,615,250,608,227,599,197,629,165,590,139,573,82,573">
+                <area alt="mali" area class="mali" title="Mali" shape="poly" coords="377,345,416,345,568,461,589,486,619,500,621,523,642,523,646,606,625,624,568,624,527,633,466,668,421,682,390,725,381,762,360,760,351,753,338,751,328,763,308,757,294,743,283,718,272,696,255,701,238,701,215,698,210,670,199,645,207,620,230,609,249,611,376,614,387,595,373,586">
+                <area alt="niger" area class="niger" title="Niger" shape="poly" coords="646,521,695,504,854,399,920,403,934,417,943,470,964,488,951,585,907,633,898,650,898,668,868,689,854,686,810,680,792,698,766,691,745,677,725,691,692,673,656,672,639,677,628,703,621,712,589,712,586,695,568,698,536,659,533,642,563,636,619,624,651,606">
+                <area alt="chad" area class="chad" title="Chad" shape="poly" coords="974,406,1190,513,1190,615,1160,619,1142,650,1137,695,1163,748,1137,753,1110,788,1054,806,1049,827,951,848,934,809,921,779,955,783,939,748,934,700,904,664,904,647,951,585,966,482,943,456,946,417">
+                <area alt="sudan" area class="sudan" title="Sudan" shape="poly" coords="1216,438,1526,429,1552,514,1579,535,1557,558,1543,571,1534,624,1534,650,1531,686,1499,725,1496,742,1481,744,1478,792,1467,795,1464,771,1446,762,1437,709,1428,700,1425,712,1407,709,1414,739,1390,771,1367,756,1345,760,1345,774,1331,774,1303,765,1292,780,1250,783,1239,765,1225,762,1193,812,1182,780,1158,748,1147,698,1133,702,1161,620,1193,613,1186,496,1214,489">
+                <area alt="eritrea" area class="eritrea" title="Eritrea" shape="poly" coords="1582,535,1623,622,1640,627,1663,636,1685,659,1706,680,1715,689,1702,701,1640,645,1605,636,1587,640,1579,632,1566,648,1540,645,1543,571,1561,555">
+                <area alt="djibouti" area class="djibouti" title="Djibouti" shape="poly" coords="1715,689,1727,706,1707,723,1724,726,1718,739,1704,739,1688,735,1692,712">
+                <area alt="senegal" area class="senegal" title="Senegal" shape="poly" coords="66,654,61,643,47,627,73,603,82,571,133,571,149,582,165,590,195,629,195,663,211,682,206,698,146,686,107,686,57,691,63,675,89,673,109,666,123,673,142,670,130,659,110,654,84,660">
+                <area alt="thegambia" area class="thegambia" title="The Gambia" shape="poly" coords="63,670,91,670,108,662,134,670,149,666,118,655,95,655,68,655">
+                <area alt="guinea-bissau" area class="guinea-bissau" title="Guinea-Bissau" shape="poly" coords="64,696,103,691,148,691,148,718,121,718,103,739">
+                <area alt="guinea" area class="guinea" title="Guinea" shape="poly" coords="107,744,130,723,148,723,148,691,209,700,209,714,222,714,239,712,254,712,271,700,284,723,280,739,292,744,298,765,298,788,307,809,298,815,289,824,292,841,280,841,262,850,259,824,254,815,241,815,223,818,227,793,215,779,201,771,179,771,170,783,156,793">
+                <area alt="sierraleonne" area class="sierraleonne" title="Sierra Leone" shape="poly" coords="153,795,169,792,179,774,204,771,222,788,223,818,241,815,231,827,201,854,183,845,165,832,151,818">
+                <area alt="liberia" area class="liberia" title="Liberia" shape="poly" coords="197,857,223,836,227,827,241,815,255,818,262,845,268,854,282,845,289,859,282,875,294,880,312,898,312,912,303,930,282,924">
+                <area alt="coted'ivoire" area class="cotedivoire" title="Cote D'ivoir" shape="poly" coords="307,933,307,915,312,898,298,880,282,871,289,862,285,845,294,841,298,832,294,818,307,822,303,797,294,788,307,762,321,769,335,762,351,751,352,765,379,765,400,783,423,779,436,774,444,788,453,827,441,841,432,866,436,919,400,915">
+                <area alt="burkinafaso" area class="burkinafaso" title="Burkina Faso" shape="poly" coords="445,748,445,786,431,774,401,783,380,762,387,730,410,709,419,686,463,673,493,647,528,638,537,663,565,703,583,703,596,718,587,735,565,735,548,748,511,742,503,751">
+                <area alt="ghana" area class="ghana" title="Ghana" shape="poly" coords="436,915,441,892,436,866,439,854,457,822,444,748,524,748,524,765,533,778,550,898,520,898,467,928">
+                <area alt="togo" area class="togo" title="Togo" shape="poly" coords="524,744,549,748,542,765,557,774,577,884,554,889,542,877,536,783,527,769">
+                <area alt="benin" area class="benin" title="Benin" shape="poly" coords="572,885,563,776,545,767,549,740,580,732,595,714,621,721,628,756,621,779,603,820,602,880">
+                <area alt="nigeria" area class="nigeria" title="Nigeria" shape="poly" coords="642,882,598,882,603,815,610,788,619,779,625,767,633,753,625,740,625,709,639,700,642,682,681,670,718,695,743,687,766,696,787,700,810,687,849,686,868,691,898,670,920,691,913,700,925,714,921,735,907,744,881,815,863,824,840,877,819,871,792,868,775,885,757,924,748,933,722,930,683,944,669,908">
+                <area alt="cameroon" area class="cameroon" title="Cameroon" shape="poly" coords="757,924,789,871,819,862,824,877,840,880,872,818,884,815,898,753,920,735,921,712,916,691,934,703,937,739,934,756,951,783,925,779,916,801,939,813,951,854,930,892,930,924,973,981,969,1013,934,1000,796,1000,801,965,792,947,775,945">
+                <area alt="centralafricanrepublic" area class="centralafricanrepublic" title="Central African Republic" shape="poly" coords="969,983,934,930,930,900,957,850,1040,836,1057,824,1057,806,1102,802,1128,774,1133,758,1158,749,1181,779,1181,806,1199,815,1231,841,1261,871,1269,891,1287,908,1269,921,1234,912,1213,915,1181,930,1160,921,1155,938,1107,935,1089,921,1072,917,1049,933,1049,956,1027,961,1004,956">
+                <area alt="southsudan" area class="southsudan" title="South Sudan" shape="poly" coords="1222,827,1204,824,1201,809,1222,771,1243,765,1248,783,1292,783,1292,771,1328,769,1331,779,1345,774,1345,762,1360,760,1390,779,1416,739,1411,712,1434,709,1446,765,1466,795,1481,797,1478,815,1451,818,1448,839,1464,839,1478,854,1490,866,1508,903,1526,910,1531,924,1496,930,1451,956,1386,951,1360,930,1319,933,1298,912,1266,889,1245,857">
+                <area alt="ethiopia" area class="ethiopia" title="Ethiopia" shape="poly" coords="1455,815,1448,832,1469,845,1499,871,1510,898,1526,908,1531,926,1566,930,1589,951,1637,956,1658,938,1681,942,1699,944,1752,912,1787,915,1863,824,1837,824,1761,797,1713,753,1716,739,1690,744,1690,726,1699,700,1642,643,1587,647,1570,638,1566,652,1536,650,1531,687,1501,721,1501,744,1481,758,1481,792,1474,824">
+                <area alt="somalia" area class="somalia" title="Somalia" shape="poly" coords="1720,744,1729,726,1752,753,1773,756,1799,742,1821,744,1844,730,1865,730,1920,712,1932,709,1944,709,1950,748,1937,783,1914,831,1897,894,1852,951,1805,1000,1693,1105,1676,1089,1672,974,1706,956,1755,915,1787,915,1870,827,1840,824,1769,801,1732,774">
+                <area alt="equatorialguinea" area class="equatorialguinea" title="Equatorial Guinea" shape="poly" coords="792,1000,833,1000,833,1027,794,1032,780,1027">
+                <area alt="saotomeandprincipe" area class="saotomeandprincipe" title="Sao Tome and Principe" shape="circle" coords="713,1036,37">
+                <area alt="gabon" area class="gabon" title="Gabon" shape="poly" coords="789,1034,837,1030,838,1000,890,1000,891,1021,900,1021,918,1021,921,1039,913,1052,921,1097,904,1128,886,1119,847,1131,845,1150,830,1163,780,1115,766,1083">
+                <area alt="rep-ofthecongo" area class="rep-ofthecongo" title="Republic of the Condo" shape="poly" coords="895,1000,934,1000,969,1013,974,983,1010,956,1022,968,1049,960,1024,1013,1019,1074,980,1119,974,1159,927,1195,918,1177,895,1195,877,1186,856,1198,828,1168,851,1150,847,1129,877,1120,907,1128,921,1080,916,1050,925,1032,904,1018,891,1027">
+                <area alt="democraticrepublicofthecongo" area class="democraticrepublicofthecongo" title="Democratic Republic of the Condo" shape="poly" coords="1024,1080,1027,1000,1050,951,1054,930,1072,912,1086,915,1103,933,1155,938,1163,924,1181,928,1213,915,1231,921,1257,912,1292,915,1314,937,1345,937,1354,924,1386,956,1390,990,1404,1000,1363,1043,1358,1092,1333,1128,1342,1136,1349,1207,1381,1290,1333,1304,1328,1357,1315,1389,1333,1407,1345,1407,1349,1437,1328,1428,1299,1405,1278,1393,1237,1393,1223,1371,1206,1375,1202,1363,1153,1366,1140,1380,1131,1371,1149,1357,1131,1331,1128,1269,1105,1265,1101,1257,1070,1255,1061,1281,1013,1287,981,1230,907,1221,863,1234,863,1221,875,1221,879,1195,902,1195,914,1186,925,1198,972,1163,981,1119,1002,1092">
+                <area alt="rwanda" area class="rwanda" title="Rwanda" shape="poly" coords="1333,1128,1360,1096,1377,1092,1395,1115,1383,1128,1363,1128,1351,1136">
+                <area alt="burundi" area class="burundi" title="Burundi" shape="poly" coords="1345,1133,1354,1140,1367,1140,1367,1128,1379,1131,1384,1149,1381,1163,1363,1184,1345,1189,1349,1154">
+                <area alt="uganda" area class="uganda" title="Uganda" shape="poly" coords="1363,1092,1361,1048,1405,997,1393,991,1390,956,1464,956,1478,944,1490,956,1490,974,1504,979,1508,1014,1455,1085,1381,1089,1390,1115,1379,1124,1367,1124,1358,1133,1349,1129,1335,1129">
+                <area alt="kenya" area class="kenya" title="Kenya" shape="poly" coords="1490,930,1552,930,1584,951,1632,960,1640,945,1672,938,1693,945,1686,965,1676,977,1672,1078,1690,1101,1628,1189,1589,1168,1584,1145,1469,1069,1510,1013,1501,983,1492,968,1481,938">
+                <area alt="angola" area class="angola" title="Angola" shape="poly" coords="866,1234,902,1219,979,1225,1008,1287,1041,1287,1068,1287,1070,1257,1091,1257,1100,1269,1126,1269,1126,1308,1126,1331,1140,1357,1131,1370,1144,1380,1153,1371,1191,1370,1191,1419,1135,1424,1135,1525,1161,1552,1117,1566,1043,1557,1034,1548,911,1543,888,1530,866,1543,852,1539,852,1504,870,1446,890,1419,907,1361,886,1318,886,1274,860,1221,872,1216,881,1195,881,1184,872,1193,851,1202">
+                <area alt="zambia" area class="zambia" title="Zambia" shape="poly" coords="1133,1527,1133,1421,1202,1424,1190,1416,1195,1363,1208,1377,1220,1371,1255,1398,1273,1389,1308,1407,1319,1424,1349,1437,1349,1407,1328,1403,1322,1394,1326,1363,1331,1310,1379,1292,1402,1306,1407,1318,1437,1322,1458,1363,1451,1401,1443,1421,1434,1442,1437,1456,1358,1490,1358,1504,1340,1504,1314,1509,1314,1530,1284,1543,1261,1562,1225,1566,1213,1548,1169,1557">
+                <area alt="malawi" area class="malawi" title="Malawi" shape="poly" coords="1450,1333,1467,1336,1490,1384,1481,1437,1511,1469,1520,1504,1508,1518,1490,1543,1473,1513,1478,1477,1455,1477,1451,1460,1437,1456,1434,1442,1450,1421,1455,1407,1455,1380,1464,1363">
+                <area alt="mozambique" area class="mozambique" title="Mozambique" shape="poly" coords="1490,1393,1526,1389,1538,1396,1573,1393,1579,1384,1605,1384,1653,1366,1662,1375,1646,1393,1649,1472,1655,1481,1640,1499,1644,1511,1623,1529,1619,1538,1596,1552,1587,1552,1540,1569,1522,1605,1513,1596,1469,1631,1473,1644,1487,1697,1478,1743,1481,1751,1446,1776,1411,1790,1402,1804,1414,1804,1407,1820,1393,1820,1384,1693,1407,1672,1428,1626,1428,1591,1428,1534,1367,1507,1358,1484,1441,1467,1455,1481,1481,1481,1478,1516,1485,1539,1494,1552,1499,1530,1517,1516,1517,1481,1499,1460,1487,1437">
+                <area alt="nambia" area class="nambia" title="Nambia" shape="poly" coords="842,1539,860,1545,881,1536,907,1543,1031,1548,1040,1557,1110,1566,1208,1548,1211,1560,1178,1578,1163,1571,1102,1575,1096,1675,1075,1672,1066,1857,1049,1870,1010,1875,996,1852,978,1863,951,1827,939,1778,934,1760,925,1739,928,1689,867,1583,854,1583">
+                <area alt="botswana" area class="botswana" title="Botswana" shape="poly" coords="1102,1675,1102,1575,1172,1575,1176,1583,1211,1560,1231,1587,1257,1619,1284,1636,1291,1670,1317,1684,1225,1758,1225,1776,1190,1778,1167,1773,1123,1808,1093,1804,1093,1778,1072,1755,1075,1679">
+                <area alt="zimbabwe" area class="zimbabwe" title="Zimbabwe" shape="poly" coords="1223,1566,1248,1566,1257,1575,1315,1530,1319,1513,1354,1504,1360,1513,1434,1530,1434,1575,1421,1606,1421,1628,1398,1675,1386,1693,1338,1686,1298,1672,1289,1640,1262,1624,1239,1601">
+                <area alt="southafrica" area class="southafrica" title="South Africa" shape="poly" coords="974,1866,992,1852,1010,1875,1045,1870,1063,1852,1072,1755,1093,1778,1089,1808,1125,1811,1163,1778,1190,1785,1222,1781,1225,1760,1319,1689,1328,1688,1345,1693,1367,1689,1381,1702,1390,1790,1381,1787,1367,1796,1358,1811,1358,1829,1372,1829,1390,1817,1402,1820,1398,1852,1337,1914,1314,1891,1307,1875,1298,1866,1280,1875,1262,1882,1252,1900,1266,1917,1278,1926,1287,1914,1315,1893,1337,1914,1239,2011,1208,2015,1183,2023,1125,2016,1080,2025,1054,2034,1010,1981,1024,1953">
+                <area alt="lesotho" area class="lesotho" title="Lesotho" shape="poly" coords="1262,1884,1296,1866,1314,1896,1292,1910,1280,1914,1280,1926,1266,1926,1252,1896">
+                <area alt="swaziland" area class="swaziland" title="Swaziland" shape="poly" coords="1384,1796,1375,1787,1360,1808,1360,1826,1367,1834,1390,1820">
+                <area alt="madagascar" area class="madagascar" title="Madagascar" shape="poly" coords="1764,1799,1787,1796,1893,1548,1893,1522,1911,1534,1898,1433,1884,1424,1872,1451,1858,1460,1845,1469,1845,1490,1837,1504,1828,1495,1822,1504,1822,1516,1810,1509,1801,1522,1799,1530,1787,1522,1769,1525,1743,1530,1725,1566,1743,1622,1711,1667,1708,1684,1699,1702,1695,1737,1699,1769,1716,1804,1729,1808">
+                <area alt="tanzania" area class="tanzania" title="Tanzania" shape="poly" coords="1381,1087,1455,1087,1467,1074,1587,1149,1591,1166,1623,1196,1614,1232,1632,1264,1623,1299,1653,1364,1605,1384,1587,1384,1540,1393,1526,1387,1490,1387,1476,1338,1411,1313,1393,1302,1375,1267,1354,1237,1349,1184,1379,1172,1393,1149,1384,1131,1393,1119">
+            </map>
+        </center>
+
+
+<!-- the following is a quick reference to the data sources used for this project -->
+
+        <div class="sources">
+            Sources used for information: http://popstats.unhcr.org/en/asylum_seekers, http://www.unhcr.org/5943e8a34.pdf, and http://databank.worldbank.org/data/download/POP.pdf;
+        </div>
+
+
+        <script language="javascript">
+
+// the following is the code that passes the values into the increment function on the state machine, which in turn sets the values of cells in the tables
+// to the values here. this particular section handles when a user selects a country from the dropdown list
+
+function passSelectToStateMachine(countryName) {
+    if (countryName == "algeria") {
+        state.increment("Algeria", "40,606", "94232", "431:1", "Germany, 2386", "France, 866", "Netherlands, 536");
+    }
+    else if(countryName == "angola"){
+        state.increment("Angola", "40,606", "94232", "431:1", "Germany, 2386", "France, 866", "Netherlands, 536");
+    }
+    else if (countryName == "benin") {
+        state.increment("Benin", "10872", "809", "13439:1", "Germany, 65", "Italy, 56", "South Africa, 48");
+    }
+    else if (countryName == "botswana") {
+        state.increment("Botswana", "2250", "2093", "1076:1", "South Africa, 8", "Unavailable", "Unavailable");
+    }
+    else if (countryName == "burkinafaso") {
+        state.increment("Burkina Faso", "18646", "32,552", "573:1", "Italy, 163", "United States of America, 130", "Germany, 145");
+    }
+    else if (countryName == "burundi") {
+        state.increment("Burundi", "10524", "57469", "184:1", "Kenya, 3096", "Uganda, 1244", "Mozambique, 1231");
+    }
+    else if (countryName == "cameroon") {
+        state.increment("Cameroon", "23439", "375415", "63:1", "South Africa, 652", "Germany, 437", "Italy, 341");
+    }
+    else if (countryName == "centralafricanrepublic") {
+        state.increment("Central African Republic", "4595", "12115", "380:1", "Cameroon, 3731", "Chad, 913", "France, 760");
+    }
+    else if (countryName == "chad") {
+        state.increment("Chad", "14453", "391251", "37:1", "Cameroon, 267", "Germany, 139", "Canada, 96");
+    }
+    else if (countryName == "cotedlvoire") {
+        state.increment("Cote d'ivoire", "23696", "1399", "16938:1", "Italy, 1178", "Ghana, 858", "Switzlerland, 314");
+    }
+    else if (countryName == "democraticrepbulicofthecongo") {
+        state.increment("Democratic Republic of the Congo", "78736", "451956", "175:1", "Uganda, 12283", "South Africa, 9746", "Burandi, 6025");
+    }
+    else if (countryName == "djibouti") {
+        state.increment("Djibouti", "942", "17683", "54:1", "Canada, 105", "Belgium, 74", "France, 27");
+    }
+    else if (countryName == "egypt") {
+        state.increment("Egypt", "95689", "213530", "449:1", "Germany, 1146", "United States of America, 295", "Italy, 275");
+    }
+    else if (countryName == "equatorialguinea") {
+        state.increment("Equatorial Guinea", "1221", "Unavailable", "Unavailable", "Sweden, 1", "Unavailable", "Unavailable");
+    }
+    else if (countryName == "eritrea") {
+        state.increment("Eritrea", "5281", "2342", "2255:1", "Germany, 22608", "Switzerland, 7215", "Sweden, 6620");
+    }
+    else if (countryName == "ethiopia") {
+        state.increment("Ethiopia", "102403", "791631", "130:1", "South Africa, 12799", "Yemen, 4131", "Egypt, 1005");
+    }
+    else if (countryName == "gabon") {
+        state.increment("Gabon", "1980", "931", "2127:1", "France, 15", "South Africa, 9", "Germany, 3");
+    }
+    else if (countryName == "gambia") {
+        state.increment("The Gambia", "2039", "7940", "257:1", "Italy, 2815", "Switzerland, 1145", "Germany, 808");
+    }
+    else if (countryName == "ghana") {
+        state.increment("Ghana", "28207", "11865", "2378:1", "South Africa, 1691", "Italy, 1299", "Germany, 600");
+    }
+    else if (countryName == "guinea") {
+        state.increment("Guinea", "12396", "5068", "2446:1", "France, 1006", "Switzerland, 769", "Italy, 741");
+    }
+    else if (countryName == "guineabissau") {
+        state.increment("Guinea-Bissau", "1816", "9263", "197:1", "Germany, 370", "Italy, 204", "Switzerland, 94");
+    }
+    else if (countryName == "kenya") {
+        state.increment("Kenya", "48462", "451099", "108:1", "South Africa, 455", "Germany, 135", "United States of America, 82");
+    }
+    else if (countryName == "lesotho") {
+        state.increment("Lesotho", "2204", "45", "48978:1", "South Africa, 397", "Unavalable", "Unavailable");
+    }
+    else if (countryName == "liberia") {
+        state.increment("Liberia", "4614", "18990", "243:1", "Cote d'lvoire, 232", "United States of America, 112", "Italy, 53");
+    }
+    else if (countryName == "libya") {
+        state.increment("Libya", "6293", "9310", "676:1", "Germany, 940", "Malta, 666", "United Kingdom, 291");
+    }
+    else if (countryName == "madagascar") {
+        state.increment("Madagascar", "24895", "28", "889108:1", "France, 19", "Unavailable", "Unavailable");
+    }
+    else if (countryName == "malawi") {
+        state.increment("Malawi", "18092", "9392", "1927:1", "South Africa, 1954", "United Kingdom, 34", "Ireland, 30");
+    }
+    else if (countryName == "mauritania") {
+        state.increment("Mauritania", "4301", "74148", "59:1", "France, 411", "United States of America, 107", "Germany, 75");
+    }
+    else if (countryName == "morocco") {
+        state.increment("Morocco", "35277", "4771", "7395:1", "Germany, 2085", "Hungar, 791", "Netherlands, 761");
+    }
+    else if (countryName == "mozambique") {
+        state.increment("Mozambique", "28829", "4671", "6172:1", "Malawi, 6618", "South Africa, 746", "Brazil, 16");
+    }
+    else if (countryName == "nambia") {
+        state.increment("Nambia", "2480", "1757", "1412:1", "United Kingdom, 8", "Unavailable", "Unavailable");
+    }
+    else if (countryName == "niger") {
+        state.increment("Niger", "20673", "166093", "125:1", "Germany, 169", "South Africa, 59", "Italy, 43");
+    }
+    else if (countryName == "nigeria") {
+        state.increment("Nigeria", "185990", "1367", "136058:1", "South Africa, 7447", "Italy, 4593", "Germany, 2287");
+    }
+    else if (countryName == "republicofthecongo") {
+        state.increment("Republic of the Congo", "46457", "94,232", "111:1", "South Africa, 533", "Turkey, 197", "United States of America, 147");
+    }
+    else if (countryName == "rwanda") {
+        state.increment("Rwanda", "11918", "156065", "77:1", "Malawi, 405", "Uganda, 309", "Mozambique, 261");
+    }
+    else if (countryName == "saotomeandprincipe") {
+        state.increment("Sao Tome and Principe", "200", "Unavailable", "Unavailable", "Unavailable", "Unavailable", "Unavailable");
+    }
+    else if (countryName == "senegal") {
+        state.increment("Senegal", "15412", "14584", "1057:1", "Italy, 1725", "South Africa, 478", "Switzerland,  329");
+    }
+    else if (countryName == "sierraleone") {
+        state.increment("Sierra Leonne", "7396", "683", "10829:1", "Switzlerland, 112", "Germany, 107", "Italy, 88");
+    }
+    else if (countryName == "somalia") {
+        state.increment("Somalia", "14318", "11574", "1238:1", "Germany, 7484", "Uganda, 5279", "Sweden, 2316");
+    }
+    else if (countryName == "southafrica") {
+        state.increment("South Africa", "55909", "91043", "615:1", "Ireland, 39", "United Kingdom, 25", "Republic of Korea, 19");
+    }
+    else if (countryName == "southsudan") {
+        state.increment("South Sudan", "12231", "262560", "47:1", "Egypt, 1291", "Ethopia, 439", "Kenya, 192");
+    }
+    else if (countryName == "sudan") {
+        state.increment("Sudan", "39579", "421466", "94:1", "Egypt, 259", "France, 3213", "Kenya, 1894");
+    }
+    else if (countryName == "swaziland") {
+        state.increment("Swaziland", "1343", "728", "1845:1", "South Africa, 24", "United Kingdom, 3", "Unavailable");
+    }
+    else if (countryName == "tanzania") {
+        state.increment("Tanzania", "55572", "281498", "198:1", "South Africa, 510", "Kenya, 31", "Sweden, 19");
+    }
+    else if (countryName == "togo") {
+        state.increment("Togo", "7606", "12491", "609:1", "Ghana, 259", "Italy, 135", "Germany, 73");
+    }
+    else if (countryName == "tunisia") {
+        state.increment("Tunisia", "11403", "649", "17571:1", "Germany, 878", "Switzerland, 236", "Netherlands, 107");
+    }
+    else if (countryName == "uganda") {
+        state.increment("Uganda", "41488", "940835", "45:1", "South Africa, 1554", "Kenya, 587", "United Kingdom, 175");
+    }
+    else if (countryName == "westernsahara") {
+        state.increment("Western Sahara", "538", "Unavailable", "Unavailable", "France, 133", "Unavailable", "Unavailable");
+    }
+    else if (countryName == "zambia") {
+        state.increment("Zambia", "16591", "29350", "566:1", "South Africa, 136", "Malawi, 6", "United Kingdom, 6");
+    }
+    else if (countryName == "zimbabwe") {
+        state.increment("Zimbabwe", "16150", "7426", "2175:1", "South Africa, 14813", "United Kingdom, 130", "Ireland, 107");
+    }
+
+}
+
+// the following is a state machine that helps control the flow of the website. essentially this assures that on the first selection of a country,
+// either through the dropdown or direct selection via the image map, the first table will have its values inserted and will go from hidden to visible.
+// this also assures that on the second click and every click afterwards (unless the page is reset) the second table will be the one who is made visible
+// and whose values will be inserted upon.
+
+function stateMachine () {
+	this.state = 0;
+	this.increment = function(countryName, totalPopulation, totalRefugees, ratio, primaryAsylum, secondaryAsylum, tertiaryAsylum){
+		if(this.state < 4){
+			this.state = this.state + 1;
+		}
+		else{
+			this.state = this.state - 1;
+		}
+		if (this.state == 1) {
+			table = document.getElementById("firstTable");
+			button = document.getElementById("resetButton");
+			cells = table.getElementsByTagName('td');
+			tutorialText = document.getElementById("basicInstructions");
+			cells[0].innerHTML = countryName;
+			cells[1].innerHTML = totalPopulation;
+			cells[2].innerHTML = totalRefugees;
+			cells[3].innerHTML = ratio;
+			cells[4].innerHTML = primaryAsylum;
+			cells[5].innerHTML = secondaryAsylum;
+			cells[6].innerHTML = tertiaryAsylum;
+			table.style.visibility = "visible";
+			button.style.visibility = "visible";
+			tutorialText.style.visibility = "hidden";
+		}
+		if(this.state >= 2){
+			table = document.getElementById("secondTable");
+			cells = table.getElementsByTagName('td');
+			cells[0].innerHTML = countryName;
+			cells[1].innerHTML = totalPopulation;
+			cells[2].innerHTML = totalRefugees;
+			cells[3].innerHTML = ratio;
+			cells[4].innerHTML = primaryAsylum;
+			cells[5].innerHTML = secondaryAsylum;
+			cells[6].innerHTML = tertiaryAsylum;
+			table.style.visibility = "visible";
+		}
+	};
+
+	this.reset = function(){
+		table1 = document.getElementById("firstTable");
+		table2 = document.getElementById("secondTable");
+		table1.style.visibility = "hidden";
+		table2.style.visibility = "hidden";
+		this.state = 0;
+	};
+}
+
+var state = new stateMachine();
+
+// the following is the code that passes the values into the increment function on the state machine, which in turn sets the values of cells in the tables
+// to the values here. this particular section handles when a user clicks on a country to display their values
+
+$(".algeria").on("click", function(e){
+	state.increment("Algeria", "40,606", "94232", "431:1", "Germany, 2386", "France, 866", "Netherlands, 536");
+});
+$(".angola").on("click", function(e){
+    state.increment("Angola", "28,813", "15555", "1853:1", "France, 158", "Germany, 51", "South Africa, 45");
+});
+$(".benin").on("click", function(e){
+    state.increment("Benin", "10872", "809", "13439:1", "Germany, 65", "Italy, 56", "South Africa, 48");
+});
+$(".botswana").on("click", function (e) {
+    state.increment("Botswana", "2250", "2093", "1076:1", "South Africa, 8", "Unavailable", "Unavailable");
+});
+$(".burkinafaso").on("click", function (e) {
+    state.increment("Burkina Faso", "18646", "32,552", "573:1", "Italy, 163", "United States of America, 130", "Germany, 145");
+});
+$(".burundi").on("click", function (e) {
+    state.increment("Burundi", "10524", "57469", "184:1", "Kenya, 3096", "Uganda, 1244", "Mozambique, 1231");
+});
+$(".cameroon").on("click", function (e) {
+    state.increment("Cameroon", "23439", "375415", "63:1", "South Africa, 652", "Germany, 437", "Italy, 341");
+});
+$(".centralafricanrepublic").on("click", function (e) {
+    state.increment("Central African Republic", "4595", "12115", "380:1", "Cameroon, 3731", "Chad, 913", "France, 760");
+});
+$(".chad").on("click", function(e){
+    state.increment("Chad", "14453", "391251", "37:1", "Cameroon, 267", "Germany, 139", "Canada, 96");
+});
+$(".cotedivoire").on("click", function(e){
+    state.increment("Cote d'ivoire", "23696", "1399", "16938:1", "Italy, 1178", "Ghana, 858", "Switzlerland, 314");
+});
+$(".democraticrepublicofthecongo").on("click", function(e){
+    state.increment("Democratic Republic of the Congo", "78736", "451956", "175:1", "Uganda, 12283", "South Africa, 9746", "Burandi, 6025");
+});
+$(".djibouti").on("click", function(e){
+    state.increment("Djibouti", "942", "17683", "54:1", "Canada, 105", "Belgium, 74", "France, 27");
+});
+$(".egypt").on("click", function(e){
+    state.increment("Egypt", "95689", "213530", "449:1", "Germany, 1146", "United States of America, 295", "Italy, 275");
+});
+$(".equatorialguinea").on("click", function(e){
+    state.increment("Equatorial Guinea", "1221", "Unavailable", "Unavailable", "Sweden, 1", "Unavailable", "Unavailable");
+});
+$(".eritrea").on("click", function(e){
+    state.increment("Eritrea", "5281", "2342", "2255:1", "Germany, 22608", "Switzerland, 7215", "Sweden, 6620");
+});
+$(".ethiopia").on("click", function(e){
+    state.increment("Ethiopia", "102403", "791631", "130:1", "South Africa, 12799", "Yemen, 4131", "Egypt, 1005");
+});
+$(".gabon").on("click", function(e){
+    state.increment("Gabon", "1980", "931", "2127:1", "France, 15","South Africa, 9", "Germany, 3");
+});
+$(".thegambia").on("click", function(e){
+    state.increment("The Gambia", "2039", "7940", "257:1", "Italy, 2815", "Switzerland, 1145", "Germany, 808");
+});
+$(".ghana").on("click", function(e){
+    state.increment("Ghana", "28207", "11865", "2378:1", "South Africa, 1691", "Italy, 1299", "Germany, 600");
+});
+$(".guinea").on("click", function(e){
+    state.increment("Guinea", "12396", "5068", "2446:1", "France, 1006", "Switzerland, 769", "Italy, 741");
+});
+$(".guinea-bissau").on("click", function(e){
+    state.increment("Guinea-Bissau", "1816", "9263", "197:1", "Germany, 370", "Italy, 204", "Switzerland, 94");
+});
+$(".kenya").on("click", function(e){
+    state.increment("Kenya", "48462", "451099", "108:1", "South Africa, 455", "Germany, 135", "United States of America, 82");
+});
+$(".lesotho").on("click", function(e){
+    state.increment("Lesotho", "2204", "45", "48978:1", "South Africa, 397", "Unavalable","Unavailable");
+});
+$(".liberia").on("click", function(e){
+    state.increment("Liberia", "4614", "18990", "243:1", "Cote d'lvoire, 232", "United States of America, 112", "Italy, 53");
+});
+$(".libya").on("click", function(e){
+    state.increment("Libya", "6293", "9310", "676:1", "Germany, 940", "Malta, 666", "United Kingdom, 291");
+});
+$(".madagascar").on("click", function(e){
+    state.increment("Madagascar", "24895", "28", "889108:1", "France, 19", "Unavailable", "Unavailable");
+});
+$(".malawi").on("click", function(e){
+    state.increment("Malawi", "18092", "9392", "1927:1", "South Africa, 1954", "United Kingdom, 34", "Ireland, 30");
+});
+$(".mauritania").on("click", function(e){
+    state.increment("Mauritania", "4301", "74148", "59:1", "France, 411", "United States of America, 107", "Germany, 75");
+});
+$(".morocco").on("click", function(e){
+	state.increment("Morocco", "35277", "4771", "7395:1", "Germany, 2085", "Hungar, 791", "Netherlands, 761");
+});
+$(".mozambique").on("click", function(e){
+    state.increment("Mozambique", "28829", "4671", "6172:1", "Malawi, 6618", "South Africa, 746", "Brazil, 16");
+});
+$(".nambia").on("click", function(e){
+    state.increment("Nambia", "2480", "1757", "1412:1", "United Kingdom, 8", "Unavailable", "Unavailable");
+});
+$(".niger").on("click", function(e){
+    state.increment("Niger", "20673", "166093", "125:1", "Germany, 169", "South Africa, 59", "Italy, 43");
+});
+$(".nigeria").on("click", function(e){
+    state.increment("Nigeria", "185990", "1367", "136058:1", "South Africa, 7447", "Italy, 4593", "Germany, 2287");
+});
+$(".rep-ofthecongo").on("click", function(e){
+    state.increment("Rep of the Congo", "46457", "94,232", "111:1", "South Africa, 533", "Turkey, 197", "United States of America, 147");
+});
+$(".rwanda").on("click", function(e){
+    state.increment("Rwanda", "11918", "156065", "77:1", "Malawi, 405", "Uganda, 309", "Mozambique, 261");
+});
+$(".saotomeandprincipe").on("click", function(e){ // done through here
+    state.increment("Sao Tome and Principe", "200", "Unavailable", "Unavailable", "Unavailable", "Unavailable", "Unavailable");
+});
+$(".senegal").on("click", function(e){
+    state.increment("Senegal", "15412", "14584", "1057:1", "Italy, 1725", "South Africa, 478", "Switzerland,  329");
+});
+$(".sierraleonne").on("click", function(e){
+    state.increment("Sierra Leonne", "7396", "683", "10829:1", "Switzlerland, 112", "Germany, 107", "Italy, 88");
+});
+$(".somalia").on("click", function(e){
+    state.increment("Somalia", "14318", "11574", "1238:1", "Germany, 7484", "Uganda, 5279", "Sweden, 2316");
+});
+$(".southafrica").on("click", function(e){
+    state.increment("South Africa", "55909", "91043", "615:1", "Ireland, 39", "United Kingdom, 25", "Republic of Korea, 19");
+});
+$(".southsudan").on("click", function(e){
+    state.increment("South Sudan", "12231", "262560", "47:1", "Egypt, 1291", "Ethopia, 439", "Kenya, 192");
+});
+$(".sudan").on("click", function(e){
+    state.increment("Sudan", "39579", "421466", "94:1", "Egypt, 259", "France, 3213", "Kenya, 1894");
+});
+$(".swaziland").on("click", function(e){
+    state.increment("Swaziland", "1343", "728", "1845:1", "South Africa, 24", "United Kingdom, 3", "Unavailable");
+});
+$(".tanzania").on("click", function(e){
+    state.increment("Tanzania", "55572", "281498", "198:1", "South Africa, 510", "Kenya, 31", "Sweden, 19");
+});
+$(".togo").on("click", function(e){
+    state.increment("Togo", "7606", "12491", "609:1", "Ghana, 259", "Italy, 135", "Germany, 73");
+});
+$(".tunisia").on("click", function(e){
+	state.increment("Tunisia", "11403", "649", "17571:1", "Germany, 878", "Switzerland, 236", "Netherlands, 107");
+});
+$(".uganda").on("click", function(e){
+    state.increment("Uganda", "41488", "940835", "45:1", "South Africa, 1554", "Kenya, 587", "United Kingdom, 175");
+});
+$(".westernsahara").on("click", function(e){
+    state.increment("Western Sahara", "538", "Unavailable", "Unavailable", "France, 133", "Unavailable", "Unavailable");
+});
+$(".zambia").on("click", function(e){
+    state.increment("Zambia", "16591", "29350", "566:1", "South Africa, 136", "Malawi, 6", "United Kingdom, 6");
+});
+$(".zimbabwe").on("click", function(e){
+    state.increment("Zimbabwe", "16150", "7426", "2175:1", "South Africa, 14813", "United Kingdom, 130", "Ireland, 107");
+});
+
+// the following resets the page and is called when the user presses the reset button or the 'R' key. this hides the elements that 
+// need to be hidden and resets the state machine
+
+function reset(){
+	tableA = document.getElementById("firstTable");
+	tableB = document.getElementById("secondTable");
+	button = document.getElementById("resetButton");
+	tutorialText = document.getElementById("basicInstructions");
+	tableA.style.visibility = "hidden";
+	tableB.style.visibility = "hidden";
+	button.style.visibility = "hidden";
+	tutorialText.style.visibility = "visible";
+	state.reset();
+}
+
+// this is the event listener that listens for the user to press the 'R' key and resets the page if it is pressed by calling the 'reset()' button
+
+document.addEventListener('keydown', function(event) {
+	if(event.keyCode == 82) {
+		reset();
+	}
+});
+
+        </script>
+
+
+    </body>
+</html>
